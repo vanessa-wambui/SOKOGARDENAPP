@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -8,12 +9,68 @@ const Signup = () =>{
     const [email , setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [phone, setPhone] = useState("")
+
+    //define the three states of our app
+    const[loading, setLoading] = useState("");
+    const[success, setSuccess] = useState("");
+    const[error, setError] = useState("");
+
+    //below is the function that will handle the submit action 
+    const handlesubmit = async(e) =>{
+        //below we prevent our site from reloading
+        e.preventDefault()
+        //update our loading hook with amessage that will be displayed to the users trying to log in/register
+        setLoading("Please wait as registration is in progress...")
+
+        try{
+            //create a form data object that will enable you to capture the four details entered in the form
+            const formdata = new FormData();
+            //insert the four details interms of the key value pairs
+            formdata.append("username",username);
+            formdata.append("email",email);
+            formdata.append("password",password);
+            formdata.append("phone",phone);
+
+            // by use of axios we can access the method post
+            const response = await axios.post("https://vanessawambui.alwaysdata.net/api/signup",formdata)
+
+            //setback the loading to default
+            setLoading("");
+            // just in case everything goes on well ,update the success hook with a message
+            setSuccess("user registered successfully")
+            //clear your hooks
+            setUsername("");
+            setEmail("");
+            setPassword("");
+            setPhone("");
+
+                setTimeout(() => {
+            setSuccess("");
+               
+            }, 5000);
+
+        }
+        catch(error){
+            //set the loading back to defaut
+            setLoading("");
+
+            //update the error hook with the message given back from th response
+            setError(error.message)
+
+        }
+
+    }
+
     return(
         <div className="row justify-content-center mt-4">
             <div className="card col-md-6 shadow p-4">
                 <h1 className="text-align">Sign up</h1>
 
-                <form>
+                <h5 className="text-warning">{loading}</h5>
+                <h3 className="text-success">{success}</h3>
+                <h4 className="text-danger">{error}</h4>
+
+                <form onSubmit={handlesubmit}>
                     <input type="text"
                     placeholder="Enter the Username"
                     className="form-control"
@@ -37,7 +94,8 @@ const Signup = () =>{
                     placeholder="Enter the password"
                     className="form-control"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)} /> <br />
+                    onChange={(e) => setPassword(e.target.value)}
+                    required /> <br />
 
                     {/* {password} */}
 
@@ -46,11 +104,12 @@ const Signup = () =>{
                     placeholder="Enter your Mobile Number"
                     className="form-control"
                     value={phone}
-                    onChange={(e) => setPhone(e.target.value)}/> <br />
+                    onChange={(e) => setPhone(e.target.value)}
+                    required/> <br />
 
                     {/* {phone} */}
 
-                    <input type="button" value="Signup" className="btn btn-primary" /> <br /> <br />
+                    <input type="submit" value="Signup" className="btn btn-primary" /> <br /> <br />
 
                     Already have an account?<Link to={'/signin'}>Signin</Link>
 
